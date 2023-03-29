@@ -1,0 +1,33 @@
+psql (14.2, server 14.7)
+Type "help" for help.
+
+postgres=# CREATE TABLE stores (
+postgres(# store_id INT NOT NULL PRIMARY KEY,
+postgres(# store_name VARCHAR(100) NOT NULL,
+postgres(# store_city VARCHAR(100) NOT NULL,
+postgres(# store_location VARCHAR(100) NOT NULL,
+postgres(# store_open_date DATE NOT NULL);
+CREATE TABLE
+postgres=# CREATE TABLE products (
+postgres(# product_id INT NOT NULL PRIMARY KEY,
+postgres(# product_name VARCHAR(150) NOT NULL, 
+postgres(# product_category VARCHAR(150) NOT NULL, 
+postgres(# product_cost NUMERIC(19,2) NOT NULL,
+postgres(# product_price NUMERIC(19,2) NOT NULL);
+CREATE TABLE
+postgres=# CREATE TABLE sales (
+postgres(# sale_id INT NOT NULL PRIMARY KEY,
+postgres(# sale_date DATE NOT NULL,
+postgres(# sales_store_id INT REFERENCES stores (store_id),
+postgres(# sales_product_id INT REFERENCES products (product_id),
+postgres(# units INT NOT NULL);
+CREATE TABLE
+postgres=# CREATE TABLE inventory (
+postgres(# inv_store_id INT REFERENCES stores (store_id),
+postgres(# inv_product_id INT REFERENCES products (product_id),
+postgres(# stock_on_hand INT NOT NULL);
+CREATE TABLE
+postgres=# COPY stores FROM "/Users/Desktop/Challenges/stores.csv" DELIMITER "," CSV HEADER;
+postgres=# COPY stores FROM "/Users/Desktop/Challenges/products.csv" DELIMITER "," CSV HEADER;
+postgres=# COPY stores FROM "/Users/Desktop/Challenges/sales.csv" DELIMITER "," CSV HEADER;
+postgres=# COPY stores FROM "/Users/Desktop/Challenges/inventory.csv" DELIMITER "," CSV HEADER;
