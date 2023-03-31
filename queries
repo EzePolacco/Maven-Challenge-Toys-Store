@@ -42,13 +42,59 @@ FROM inventory
 LEFT JOIN products ON inventory.inv_product_id = products.product_id;
 
 
--- Profit by Category
--- Profit by Product
--- Profit by Store City
--- Profit by Store Location
--- Profit by Store Name
--- Top 5 stock
--- Bottom 5 stock
+-- Profit by CATEGORY
+SELECT product_category, SUM(products.product_price * sales.units) AS profit_by_category
+FROM products
+LEFT JOIN sales ON products.product_id = sales.sales_product_id
+GROUP BY products.product_category;
+
+-- Profit by PRODUCT
+SELECT product_name, SUM(products.product_price * sales.units) AS profit_by_product
+FROM products
+LEFT JOIN sales ON products.product_id = sales.sales_product_id
+GROUP BY products.product_name;
+
+-- Profit by STORE CITY
+SELECT st.store_city, SUM(products.product_price * s.units) AS profit
+FROM products
+RIGHT JOIN sales AS s 
+ON products.product_id = s.sales_product_id
+LEFT JOIN stores AS st ON s.sales_store_id = st.store_id
+GROUP BY  st.store_city
+ORDER BY profit DESC;
+
+-- Profit by STORE LOCATION
+SELECT st.store_location, SUM(products.product_price * s.units) AS profit
+FROM products
+RIGHT JOIN sales AS s
+ON products.product_id = s.sales_product_id
+LEFT JOIN stores AS st ON s.sales_store_id = st. store_id
+GROUP BY st.store_location
+ORDER BY profit DESC;
+
+-- Profit by STORE NAME
+SELECT st.store_name, SUM(products.product_price * s.units) AS profit
+FROM products
+RIGHT JOIN sales AS s
+ON products.product_id = s.sales_product_id
+LEFT JOIN stores AS st ON s.sales_store_id = st.store_id
+GROUP BY st.store_name
+ORDER BY profit DESC;
+
+-- Top 5 STOCK (QUANTITY AND VALUE)
+SELECT product_name, i.stock_on_hand AS stock, (products.product_cost * i.stock_on_hand) AS stock_value
+FROM products
+LEFT JOIN inventory AS i ON products.product_id = i.inv_product_id
+ORDER BY stock DESC
+LIMIT 5;
+
+-- Bottom 10 STOCK (QUANTITY AND VALUE)
+SELECT product_name, i.stock_on_hand AS stock, (products.product_cost * i.stock_on_hand) AS stock_value
+FROM products
+LEFT JOIN inventory AS i ON products.product_id = i.inv_product_id
+WHERE i.stock_on_hand > 0
+ORDER BY stock ASC
+LIMIT 10;
 
 -- Quantity sold
 SELECT SUM(units) FROM sales;
