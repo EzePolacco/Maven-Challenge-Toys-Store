@@ -31,3 +31,97 @@ postgres=# COPY stores FROM "/Users/Desktop/Challenges/stores.csv" DELIMITER ","
 postgres=# COPY stores FROM "/Users/Desktop/Challenges/products.csv" DELIMITER "," CSV HEADER;
 postgres=# COPY stores FROM "/Users/Desktop/Challenges/sales.csv" DELIMITER "," CSV HEADER;
 postgres=# COPY stores FROM "/Users/Desktop/Challenges/inventory.csv" DELIMITER "," CSV HEADER;
+
+
+
+
+
+-- Table: public.inventory
+
+-- DROP TABLE IF EXISTS public.inventory;
+
+CREATE TABLE IF NOT EXISTS public.inventory
+(
+    inv_store_id integer,
+    inv_product_id integer,
+    stock_on_hand integer NOT NULL,
+    CONSTRAINT inventory_inv_product_id_fkey FOREIGN KEY (inv_product_id)
+        REFERENCES public.products (product_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT inventory_inv_store_id_fkey FOREIGN KEY (inv_store_id)
+        REFERENCES public.stores (store_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.inventory
+    OWNER to postgres;
+    
+-- Table: public.products
+
+-- DROP TABLE IF EXISTS public.products;
+
+CREATE TABLE IF NOT EXISTS public.products
+(
+    product_id integer NOT NULL,
+    product_name character varying(150) COLLATE pg_catalog."default" NOT NULL,
+    product_category character varying(150) COLLATE pg_catalog."default" NOT NULL,
+    product_cost money NOT NULL,
+    product_price money NOT NULL,
+    CONSTRAINT products_pkey PRIMARY KEY (product_id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.products
+    OWNER to postgres;
+    
+-- Table: public.sales
+
+-- DROP TABLE IF EXISTS public.sales;
+
+CREATE TABLE IF NOT EXISTS public.sales
+(
+    sale_id integer NOT NULL,
+    sale_date date NOT NULL,
+    sales_store_id integer,
+    sales_product_id integer,
+    units integer NOT NULL,
+    CONSTRAINT sales_pkey PRIMARY KEY (sale_id),
+    CONSTRAINT sales_sales_product_id_fkey FOREIGN KEY (sales_product_id)
+        REFERENCES public.products (product_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT sales_sales_store_id_fkey FOREIGN KEY (sales_store_id)
+        REFERENCES public.stores (store_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.sales
+    OWNER to postgres;
+    
+-- Table: public.stores
+
+-- DROP TABLE IF EXISTS public.stores;
+
+CREATE TABLE IF NOT EXISTS public.stores
+(
+    store_id integer NOT NULL,
+    store_name character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    store_city character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    store_location character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    store_open_date date NOT NULL,
+    CONSTRAINT stores_pkey PRIMARY KEY (store_id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.stores
+    OWNER to postgres;
+    
