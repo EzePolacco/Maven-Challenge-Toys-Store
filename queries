@@ -101,3 +101,57 @@ SELECT SUM(units) FROM sales;
 
 -- Stock on hand
 SELECT SUM(stock_on_hand) FROM inventory;
+
+--Wich product categories drives the biggest profits? Is this the same across store locations?
+CREATE EXTENSION tablefunc;
+
+
+SELECT st.store_name AS store, SUM(products.product_price * s.units) AS profit, products.product_category AS category
+FROM products
+RIGHT JOIN sales AS s
+ON products.product_id = s.sales_product_id
+LEFT JOIN stores AS st ON s.sales_store_id = st.store_id
+GROUP BY st.store_name, products.product_category
+ORDER BY profit DESC;
+
+SELECT * FROM crosstab (
+    'SELECT st.store_name AS store, products.product_category AS category, SUM(products.product_price * s.units) AS profit
+FROM products
+RIGHT JOIN sales AS s
+ON products.product_id = s.sales_product_id
+LEFT JOIN stores AS st ON s.sales_store_id = st.store_id
+GROUP BY st.store_name, products.product_category
+')
+AS sales_per_category_store (store varchar, art_crafts money, electronics money, games money,
+                            sports_outdoors money, toys money);
+
+-- Can you find any seasonality or patterns in the sales? IMPROVE TIP: crear una columna con el nombre de los meses
+SELECT EXTRACT (MONTH FROM s.sale_date) AS months, SUM(s.units) AS units, products.product_category AS category
+FROM products
+RIGHT JOIN sales AS s
+ON products.product_id = s.sales_product_id
+LEFT JOIN stores AS st ON s.sales_store_id = st.store_id
+GROUP BY products.product_category, months
+ORDER BY months;
+
+
+SELECT * FROM crosstab ('SELECT products.product_category AS category, EXTRACT (MONTH FROM s.sale_date) AS months, 
+                        SUM(s.units) AS units 
+FROM products
+RIGHT JOIN sales AS s
+ON products.product_id = s.sales_product_id
+LEFT JOIN stores AS st ON s.sales_store_id = st.store_id
+GROUP BY products.product_category, months'
+)
+AS sales_seasons(category varchar, enero bigint, febrero bigint, marzo bigint, abril bigint,
+                mayo bigint, junio bigint, julio bigint, agosto bigint,
+                septiembre bigint, octubre bigint, noviembre bigint, diciembre bigint);
+
+
+-- How much money is tied up in inventory at the toy stores? How long will it last?
+SELECT st.store_name, prod.product_category AS category, SUM(prod.product_price * i.stock_on_hand) AS stock_value
+FROM products AS prod
+RIGHT JOIN inventory AS i ON prod.product_id = i.inv_product_id
+LEFT JOIN stores AS st ON i.inv_store_id = st.store_id
+GROUP BY st.store_name, category
+ORDER BY st.store_name;
