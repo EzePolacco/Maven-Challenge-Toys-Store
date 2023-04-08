@@ -1,0 +1,39 @@
+
+
+CREATE TABLE toys_sales AS (
+    SELECT  
+    s.sale_id, s.sale_date,
+    st.store_name, st.store_city, st.store_location, st.store_open_date,
+    prod.product_name, prod.product_category, prod.product_cost, prod.product_price,
+    s.units, (s.units * prod.product_price) AS profit
+
+    FROM sales AS s
+
+    LEFT JOIN stores AS st ON s.sales_store_id = st.store_id
+
+    RIGHT JOIN products AS prod ON s.sales_product_id = prod.product_id
+
+    ORDER BY s.sale_id
+    )
+;
+
+COPY toys_sales TO '/Desktop/Challenges/Maven Analytics/Datasets/TOYS_SALES.CSV' DELIMITER ',' CSV HEADER;
+
+CREATE TABLE toys_inventory AS (
+    SELECT
+    inv.inv_store_id, 
+    st.store_name, st.store_city, st.store_location, st.store_open_date,
+    prod.product_name, prod.product_category, prod.product_cost, prod.product_price,
+    inv.stock_on_hand, (inv.stock_on_hand * prod.product_price) AS stock_value_price
+
+    FROM inventory AS inv
+
+    LEFT JOIN stores AS st ON inv.inv_store_id = st.store_id
+
+    RIGHT JOIN products AS prod ON inv.inv_product_id = prod.product_id
+
+    ORDER BY inv.inv_store_id
+    )
+;
+
+COPY toys_inventory TO '/Desktop/Challenges/Maven Analytics/Datasets/TOYS_INVENTORY.CSV' CSV HEADER ;
